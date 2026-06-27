@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { REGION_OPTIONS } from '@/lib/constants/regions'
+import { validateRegisterForm, hasErrors, type RegisterErrors } from '@/lib/utils/validation'
 
 const regionOptions = REGION_OPTIONS.map(r => ({
   value: r.code,
@@ -15,7 +16,7 @@ const regionOptions = REGION_OPTIONS.map(r => ({
 export default function RegisterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<RegisterErrors>({})
   const [form, setForm] = useState({
     full_name: '',
     phone: '',
@@ -27,17 +28,10 @@ export default function RegisterPage() {
     setErrors(e => ({ ...e, [field]: '' }))
   }
 
-  function validate() {
-    const e: Record<string, string> = {}
-    if (!form.full_name.trim()) e.full_name = 'Full name is required'
-    if (!form.region_code) e.region_code = 'Please select your region'
-    return e
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const errs = validate()
-    if (Object.keys(errs).length) { setErrors(errs); return }
+    const errs = validateRegisterForm(form)
+    if (hasErrors(errs)) { setErrors(errs); return }
 
     setLoading(true)
     const supabase = createClient()
@@ -51,15 +45,24 @@ export default function RegisterPage() {
       .eq('code', form.region_code)
       .single()
 
+    if (!region) {
+      setErrors({ region_code: 'Could not resolve region. Please try again.' })
+      setLoading(false)
+      return
+    }
+
+    // upsert (not update) — the profile row is created by a DB trigger on signup,
+    // but upsert guards against the trigger being slow/absent so we never silently
+    // no-op and trap the user in a catalog↔register redirect loop.
     const { error } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: user.id,
         full_name: form.full_name.trim(),
         phone: form.phone.trim() || null,
-        region_id: region?.id,
-        preferred_currency: region?.currency_code,
+        region_id: region.id,
+        preferred_currency: region.currency_code,
       })
-      .eq('id', user.id)
 
     if (error) {
       setErrors({ full_name: error.message })
@@ -95,6 +98,7 @@ export default function RegisterPage() {
           value={form.phone}
           onChange={e => set('phone', e.target.value)}
           hint="Used for order SMS updates"
+          error={errors.phone}
         />
         <Select
           label="Your region"

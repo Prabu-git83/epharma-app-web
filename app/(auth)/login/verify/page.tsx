@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { sanitizeOtp, isOtpComplete } from '@/lib/utils/validation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 
@@ -23,6 +24,12 @@ function VerifyForm() {
   async function handleVerify(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+
+    if (!isOtpComplete(token)) {
+      setError('Enter the 6-digit code')
+      return
+    }
+
     setLoading(true)
 
     const supabase = createClient()
@@ -77,7 +84,7 @@ function VerifyForm() {
           maxLength={6}
           placeholder="000000"
           value={token}
-          onChange={e => setToken(e.target.value.replace(/\D/g, ''))}
+          onChange={e => setToken(sanitizeOtp(e.target.value))}
           required
           autoFocus
           error={error}

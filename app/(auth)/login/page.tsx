@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { isValidEmail } from '@/lib/utils/validation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 
@@ -12,6 +13,12 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address')
+      return
+    }
+
     setLoading(true)
 
     const supabase = createClient()
