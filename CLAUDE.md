@@ -211,6 +211,8 @@ using `price_local` override in `drug_region_rules` or live rate fallback.
 - No comments unless the WHY is non-obvious
 - No unused variables or imports
 - Supabase direct client calls (with RLS) for reads and simple writes
-- API routes only for: file uploads, order creation, push notifications, admin mutations
+- API routes only for: order creation, push notifications, cross-user mutations
+- Prescription uploads go directly to Supabase Storage (private `prescriptions`
+  bucket, per-user folders via RLS — see lib/supabase/storage-prescriptions.sql)
 - Tailwind only — no CSS modules or inline styles
 - `cn()` utility for conditional class merging
