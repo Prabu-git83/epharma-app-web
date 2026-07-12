@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -21,7 +22,7 @@ export function NavHeader({ user }: NavHeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <a href="/catalog" className="flex items-center gap-2">
+        <Link href="/catalog" className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-md bg-blue-600 flex items-center justify-center">
             <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -29,14 +30,15 @@ export function NavHeader({ user }: NavHeaderProps) {
             </svg>
           </div>
           <span className="font-semibold text-gray-900">ePharma</span>
-        </a>
+        </Link>
 
         <nav className="flex items-center gap-6 text-sm">
-          <a href="/catalog"      className="text-gray-600 hover:text-gray-900">Catalog</a>
-          <a href="/prescriptions" className="text-gray-600 hover:text-gray-900">Prescriptions</a>
-          <a href="/orders"       className="text-gray-600 hover:text-gray-900">Orders</a>
+          <Link href="/catalog"      className="text-gray-600 hover:text-gray-900">Catalog</Link>
+          <Link href="/prescriptions" className="text-gray-600 hover:text-gray-900">Prescriptions</Link>
+          <Link href="/cart"         className="text-gray-600 hover:text-gray-900">Cart</Link>
+          <Link href="/orders"       className="text-gray-600 hover:text-gray-900">Orders</Link>
           {['pharmacist', 'admin'].includes(user.role) && (
-            <a href="/admin/dashboard" className="text-blue-600 hover:text-blue-700 font-medium">Admin</a>
+            <Link href="/admin/dashboard" className="text-blue-600 hover:text-blue-700 font-medium">Admin</Link>
           )}
         </nav>
 

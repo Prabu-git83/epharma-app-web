@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getProfileWithRegion } from '@/lib/supabase/queries'
 import { NavHeader } from '@/components/NavHeader'
 import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { AddToCartButton } from '@/components/cart/AddToCartButton'
 import { displayPrice } from '@/lib/utils/pricing'
 
 interface DrugPageProps {
@@ -87,9 +87,7 @@ export default async function DrugPage({ params }: DrugPageProps) {
             )}
 
             <div className="mt-6">
-              <Button disabled title="Cart arrives in a later release">
-                {available ? 'Add to cart — coming soon' : 'Not available in your region'}
-              </Button>
+              <AddToCartButton drugId={drug.id} available={available} />
             </div>
           </div>
         </div>

@@ -57,5 +57,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/webhooks).*)'],
+  // API routes handle their own auth (cookie or Bearer token) — never redirect them to /login.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'],
 }
