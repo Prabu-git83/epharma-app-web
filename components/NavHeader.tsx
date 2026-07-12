@@ -38,7 +38,10 @@ export function NavHeader({ user }: NavHeaderProps) {
           <Link href="/cart"         className="text-gray-600 hover:text-gray-900">Cart</Link>
           <Link href="/orders"       className="text-gray-600 hover:text-gray-900">Orders</Link>
           {['pharmacist', 'admin'].includes(user.role) && (
-            <Link href="/admin/dashboard" className="text-blue-600 hover:text-blue-700 font-medium">Admin</Link>
+            <>
+              <Link href="/admin/prescriptions" className="text-blue-600 hover:text-blue-700 font-medium">Rx Queue</Link>
+              <Link href="/admin/orders" className="text-blue-600 hover:text-blue-700 font-medium">Order Queue</Link>
+            </>
           )}
         </nav>
 

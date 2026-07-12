@@ -215,11 +215,19 @@ export interface OrderDetailItem {
   unitPriceLocal: number
 }
 
+export interface OrderEventRow {
+  id: string
+  status: OrderRow['status']
+  note: string | null
+  createdAt: string
+}
+
 export interface OrderDetailRow {
   order: OrderRow
   regionCode: RegionCode
   address: AddressRow | null
   items: OrderDetailItem[]
+  events: OrderEventRow[]
 }
 
 /** Single order + its items (joined to drugs for names) + address. Caller must 404 if null. */
@@ -227,7 +235,7 @@ export async function getOrderDetail(supabase: Client, orderId: string): Promise
   const { data: order } = await supabase.from('orders').select('*').eq('id', orderId).single()
   if (!order) return null
 
-  const [{ data: items }, { data: address }, { data: region }] = await Promise.all([
+  const [{ data: items }, { data: address }, { data: region }, { data: events }] = await Promise.all([
     supabase.from('order_items').select('drug_id, quantity, unit_price_local').eq('order_id', orderId),
     order.address_id
       ? supabase.from('addresses').select('*').eq('id', order.address_id).single()
@@ -235,6 +243,11 @@ export async function getOrderDetail(supabase: Client, orderId: string): Promise
     order.region_id
       ? supabase.from('regions').select('code').eq('id', order.region_id).single()
       : Promise.resolve({ data: null as { code: string } | null }),
+    supabase
+      .from('order_events')
+      .select('id, status, note, created_at')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true }),
   ])
 
   const drugIds = [...new Set((items ?? []).map(i => i.drug_id))]
@@ -260,5 +273,11 @@ export async function getOrderDetail(supabase: Client, orderId: string): Promise
     regionCode: region?.code && isValidRegionCode(region.code) ? region.code : 'US',
     address: address ?? null,
     items: detailItems,
+    events: (events ?? []).map(e => ({
+      id: e.id,
+      status: e.status as OrderRow['status'],
+      note: e.note,
+      createdAt: e.created_at,
+    })),
   }
 }

@@ -1,9 +1,9 @@
 import { Badge } from '@/components/ui/Badge'
 import type { Database } from '@/lib/types/database'
 
-type OrderStatus = Database['public']['Tables']['orders']['Row']['status']
+export type OrderStatus = Database['public']['Tables']['orders']['Row']['status']
 
-const VARIANT_BY_STATUS: Record<OrderStatus, 'info' | 'rx' | 'otc' | 'danger'> = {
+export const VARIANT_BY_STATUS: Record<OrderStatus, 'info' | 'rx' | 'otc' | 'danger'> = {
   placed: 'info',
   confirmed: 'info',
   dispensed: 'rx',
@@ -12,7 +12,7 @@ const VARIANT_BY_STATUS: Record<OrderStatus, 'info' | 'rx' | 'otc' | 'danger'> =
   cancelled: 'danger',
 }
 
-const LABEL_BY_STATUS: Record<OrderStatus, string> = {
+export const LABEL_BY_STATUS: Record<OrderStatus, string> = {
   placed: 'Placed',
   confirmed: 'Confirmed',
   dispensed: 'Dispensed',

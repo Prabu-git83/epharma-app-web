@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getProfileWithRegion, getOrderDetail } from '@/lib/supabase/queries'
 import { NavHeader } from '@/components/NavHeader'
 import { OrderStatusBadge } from '@/components/orders/OrderStatusBadge'
+import { OrderTimeline } from '@/components/orders/OrderTimeline'
 import { formatPrice } from '@/lib/utils/pricing'
 
 interface OrderDetailPageProps {
@@ -23,7 +24,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
   const detail = await getOrderDetail(supabase, id)
   if (!detail) notFound()
-  const { order, regionCode, address, items } = detail
+  const { order, regionCode, address, items, events } = detail
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,7 +45,14 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             <OrderStatusBadge status={order.status} />
           </div>
 
-          <ul className="mt-6 flex flex-col gap-3">
+          <div className="mt-6 border-t border-gray-100 pt-4">
+            <h2 className="text-sm font-semibold text-gray-900">Order status</h2>
+            <div className="mt-3">
+              <OrderTimeline events={events} placedAt={order.placed_at} />
+            </div>
+          </div>
+
+          <ul className="mt-6 flex flex-col gap-3 border-t border-gray-100 pt-4">
             {items.map(item => (
               <li key={item.drugId} className="flex items-center justify-between rounded-lg border border-gray-100 p-3 text-sm">
                 <div>

@@ -130,6 +130,16 @@ export async function POST(request: Request) {
 
   await supabase.from('cart_items').delete().eq('cart_id', cart.id)
 
+  const { error: eventError } = await supabase.from('order_events').insert({
+    order_id: order.id,
+    status: 'placed',
+    note: null,
+    created_by: user.id,
+  })
+  if (eventError) {
+    console.error('Failed to seed placed order_events row:', eventError)
+  }
+
   if (process.env.RESEND_API_KEY) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY)
